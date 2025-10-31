@@ -9,9 +9,6 @@ namespace BookMoodMAUI2.Data
         public EFBookRepository(BookDbContext context)
         {
             _context = context;
-            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "books.db");
-            Debug.WriteLine($"Database location: {dbPath}");
-
         }
 
         public async Task<List<Book>> LoadAsync(CancellationToken ct = default)

@@ -3,6 +3,8 @@ using CommunityToolkit.Maui;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Maui.Toolkit.Hosting;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace BookMoodMAUI2
 {
@@ -24,7 +26,12 @@ namespace BookMoodMAUI2
                 });
 
             //EF
-            builder.Services.AddDbContext<BookDbContext>(options => options.UseSqlite("Data Source=library.db"));
+            builder.Services.AddDbContext<BookDbContext>(options =>
+            {
+                var dbPath = Path.Combine(FileSystem.AppDataDirectory, "books.db");
+                Debug.WriteLine($"File exists: {File.Exists(dbPath)}");
+                options.UseSqlite($"Data Source={dbPath}");
+            });
 
 #if DEBUG
             builder.Logging.AddDebug();
@@ -36,16 +43,29 @@ namespace BookMoodMAUI2
             builder.Services.AddSingleton<IBookFactory, DefaultBookFactory>();
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<DatabaseInitializerService>();
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<BookDbContext>();
-                db.Database.EnsureCreated();
-            }
+            InitializeDatabaseAsync(app.Services).GetAwaiter().GetResult();
 
             return app;
+        }
+
+        private static async Task InitializeDatabaseAsync(IServiceProvider services)
+        {
+            try
+            {
+                using var scope = services.CreateScope();
+                var initializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializerService>();
+                initializer.Initialize();
+                Debug.WriteLine("Database initialization completed");
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Database initialization failed: {ex.Message}");
+            }
         }
     }
 }

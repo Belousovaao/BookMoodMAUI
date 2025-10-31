@@ -12,15 +12,6 @@
     <None Update="AppShell.xaml">
       <SubType>Designer</SubType>
     </None>
-    <None Update="Pages\Controls\AddButton.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Pages\Controls\CategoryChart.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Pages\Controls\ProjectCardView.xaml">
-      <SubType>Designer</SubType>
-    </None>
     <None Update="Pages\MainPage.xaml">
       <SubType>Designer</SubType>
     </None>
