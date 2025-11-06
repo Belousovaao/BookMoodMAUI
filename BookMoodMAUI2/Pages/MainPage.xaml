@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookMoodMAUI2.Pages.MainPage"
-             xmlns:conv="clr-namespace:BookMoodMAUI2.Converter">
+             xmlns:conv="clr-namespace:BookMoodMAUI2.Converter"
+             x:Name="ThisPage">
 
     <ContentPage.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
@@ -10,128 +11,216 @@
         <conv:SelectedStrokeConverter x:Key="SelectedStrokeConverter" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto, *"  Padding="10">
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="2*" />
-        </Grid.ColumnDefinitions>
+    <Grid x:Name="MainLayout"
+            RowDefinitions="Auto, *"  
+            Padding="10">
 
         <!--Панель кнопок-->
-        <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Spacing="8" Margin="0,0,0,15">
-            <Button Text="Добавить"
+        <Grid x:Name="ButtonsPannel"
+                Grid.Row="0" 
+                Grid.ColumnSpan="2" 
+                ColumnDefinitions="*,*,*,*" 
+                ColumnSpacing="8" 
+                Margin="0,0,0,15">
+
+            <Button Grid.Column="0"
+                    Text="Добавить"
                     BackgroundColor="#c29b87"
                     Command="{Binding AddCommand}" />
 
-            <Button Text="Сохранить"
+            <Button Grid.Column="1"
+                    Text="Сохранить"
                     BackgroundColor="#c29b87"
                     Command="{Binding SaveCommand}" />
 
-            <Button Text="Загрузить"
+            <Button Grid.Column="2"
+                    Text="Загрузить"
                     BackgroundColor="#c29b87"
                     Command="{Binding LoadCommand}" />
 
-            <Button Text="Удалить"
+            <Button Grid.Column="3"
+                    Text="Удалить"
                     BackgroundColor="#c29b87"
                     Command="{Binding DeleteCommand}" />
-        </HorizontalStackLayout>
+        </Grid>
 
-        <!--Список книг-->
-        <ScrollView Grid.Row="1" Grid.Column="0">
-            <CollectionView x:Name="BooksView"
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    ItemsSource="{Binding Books}"
-                    SelectedItem="{Binding SelectedBook, Mode=TwoWay}"
-                    SelectionMode="Single">
+        <Grid x:Name="ContentGrid"
+              Grid.Row="1"
+              ColumnDefinitions="*,*"
+              RowDefinitions="*">
 
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" 
-                                Span="7" 
-                                HorizontalItemSpacing="2" 
-                                VerticalItemSpacing="2"/>
-                </CollectionView.ItemsLayout>
+            <!--Список книг-->
+            <ScrollView x:Name="BooksScrollView" 
+                        Grid.Row="0" 
+                        Grid.Column="0">
+                <CollectionView x:Name="BooksView"
+                                ItemsSource="{Binding Books}"
+                                SelectedItem="{Binding SelectedBook, Mode=TwoWay}"
+                                SelectionMode="Single">
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border 
-                        WidthRequest="80"
-                        HeightRequest="220"
-                        Margin="10"
-                        Padding="5"
-                        Stroke="{Binding IsSelected, Converter={StaticResource SelectedStrokeConverter}}"
-                        StrokeThickness="2"
-                        StrokeShape="RoundRectangle 4">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" 
+                                         Span="{OnPlatform Android=4, iOS=3, WinUI=6, Default=4}"
+                                         HorizontalItemSpacing="8" 
+                                         VerticalItemSpacing="8"/>   
+                    </CollectionView.ItemsLayout>
 
-                            <!--Фон книги-->
-                            <Border.Background>
-                                <SolidColorBrush Color="{Binding CoverColor}" />
-                            </Border.Background>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border 
+                                WidthRequest="{OnPlatform Android=60, iOS=130, WinUI=80, Default=80}"
+                                HeightRequest="{OnPlatform Android=130, iOS=170, WinUI=220, Default=220}"
+                                Margin="{OnPlatform Android='5', iOS='5', WinUI='10', Default='10'}"
+                                Padding="{OnPlatform Android='3', iOS='3', WinUI='5', Default='5'}"
+                                Stroke="{Binding IsSelected, Converter={StaticResource SelectedStrokeConverter}}"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 4">
 
-                            <Grid RowDefinitions="*, Auto">
-                                <Label Grid.Row="0"
-                                    Text="{Binding Title}"
-                                    FontAttributes="Bold"
-                                    FontSize="12"
-                                    TextColor="White"
-                                    HorizontalTextAlignment="Center"
-                                    VerticalTextAlignment="Center"
-                                    LineBreakMode="WordWrap"/>
-                                <Label Grid.Row="1"
-                                    Text="{Binding Author}"
-                                    FontSize="10"
-                                    FontAttributes="Italic"
-                                    TextColor="White"
-                                    HorizontalTextAlignment="Center"
-                                    VerticalTextAlignment="Center"
-                                    LineBreakMode="TailTruncation" 
-                                    MaxLines="2"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </ScrollView>
+                                <!--Фон книги-->
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding CoverColor}" />
+                                </Border.Background>
 
-        <!--Панель редактирования-->
-        <ScrollView Grid.Row="1" Grid.Column="1" Padding="10">
-            <Border Padding="20"
-                        Margin="10,0,0,0"
+                                <Grid RowDefinitions="*, Auto">
+                                    <Label Grid.Row="0"
+                                            Text="{Binding Title}"
+                                            FontAttributes="Bold"
+                                            FontSize="{OnPlatform Android=10, iOS=10, WinUI=12, Default=12}"
+                                            TextColor="White"
+                                            HorizontalTextAlignment="Center"
+                                            VerticalTextAlignment="Center"
+                                            LineBreakMode="WordWrap"/>
+                                    <Label Grid.Row="1"
+                                            Text="{Binding Author}"
+                                            FontSize="10"
+                                            FontAttributes="Italic"
+                                            TextColor="White"
+                                            HorizontalTextAlignment="Center"
+                                            VerticalTextAlignment="Center"
+                                            LineBreakMode="TailTruncation" 
+                                            MaxLines="2"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+
+            <!--Панель редактирования-->
+            <ScrollView x:Name="DetailsScrollView"
+                        Grid.Row="1"
+                        Grid.Column="0" 
+                        Padding="10">
+                <Border Padding="20"
                         StrokeShape="RoundRectangle 20"
                         IsVisible="{Binding SelectedBook, Converter={StaticResource NullToVisibilityConverter}}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Описание книги"
-                            FontSize="18"
-                            FontAttributes="Bold"
-                            TextColor="White" />
-                    <Entry Text="{Binding SelectedBook.Title, Mode=TwoWay}"
-                            Placeholder="Название"
-                            TextColor="Wheat"
-                            FontSize="18"/>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Описание книги"
+                                FontSize="{OnPlatform Android=12, iOS=12, WinUI=18, Default=14}"
+                                FontAttributes="Bold"
+                                TextColor="White" />    
+                        <Entry Text="{Binding SelectedBook.Title, Mode=TwoWay}"
+                                Placeholder="Название"
+                                TextColor="Wheat"
+                                FontSize="{OnPlatform Android=12, iOS=12, WinUI=18, Default=14}"
+                               HorizontalTextAlignment="Start"
+                               VerticalTextAlignment="Start"/>
 
-                    <Entry Text="{Binding SelectedBook.Author, Mode=TwoWay}"
-                            Placeholder="Автор"
-                            FontSize="18"/>
+                        <Entry Text="{Binding SelectedBook.Author, Mode=TwoWay}"
+                                Placeholder="Автор"
+                                FontSize="{OnPlatform Android=12, iOS=12, WinUI=18, Default=14}"/>
 
-                    <Editor Text="{Binding SelectedBook.Description}"
-                            AutoSize="TextChanges"
-                            Placeholder="Описание"
-                            HeightRequest="{Binding IsExpanded, Converter={StaticResource BoolToTextConverter}, ConverterParameter='300|57'}" />
+                        <Editor Text="{Binding SelectedBook.Description}"
+                                AutoSize="TextChanges"
+                                Placeholder="Описание"
+                                FontSize="{OnPlatform Android=12, iOS=12, WinUI=18, Default=14}"
+                                HeightRequest="{Binding IsExpanded, Converter={StaticResource BoolToTextConverter}, ConverterParameter='300|57'}" />
 
-                    <Button Text="{Binding IsExpanded, Converter={StaticResource BoolToTextConverter}, ConverterParameter='свернуть|развернуть'}"
-                            Command="{Binding ToggleExpandCommand}"
-                            FontSize="12"
-                            HorizontalOptions="End"
-                            BackgroundColor="Transparent"
-                            BorderColor="Transparent" />
+                        <Button Text="{Binding IsExpanded, Converter={StaticResource BoolToTextConverter}, ConverterParameter='свернуть|развернуть'}"
+                                Command="{Binding ToggleExpandCommand}"
+                                FontSize="{OnPlatform Android=10, iOS=10, WinUI=12, Default=10}"
+                                HorizontalOptions="End"
+                                BackgroundColor="Transparent"
+                                BorderColor="Transparent" />
 
-                    <Entry Text="{Binding SelectedBook.DateAdded, StringFormat='{}{0:dd.MM.yyyy HH:mm}', Mode=OneWay}"
-                            Placeholder="Дата добавления"
-                            FontSize="18"
-                            IsReadOnly="True" />
-                </VerticalStackLayout>
-            </Border>
-        </ScrollView>
+                        <Entry Text="{Binding SelectedBook.DateAdded, StringFormat='{}{0:dd.MM.yyyy HH:mm}', Mode=OneWay}"
+                                Placeholder="Дата добавления"
+                                FontSize="{OnPlatform Android=12, iOS=12, WinUI=18, Default=14}"
+                                IsReadOnly="True" />    
+                    </VerticalStackLayout>
+                </Border>
+            </ScrollView>
+        </Grid>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="OrientationStates">
+                <!-- Горизонтальная ориентация (Windows/планшет) -->
+                <VisualState x:Name="Landscape">
+                    <VisualState.StateTriggers>
+                        <OrientationStateTrigger Orientation="Landscape" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="ContentGrid" Property="Grid.ColumnDefinitions" Value="*,*" />
+                        <Setter TargetName="ContentGrid" Property="Grid.RowDefinitions" Value="*" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Padding" Value="10" />
+                        <Setter TargetName="DetailsScrollView" Property="Margin" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!-- Вертикальная ориентация (Телефон) -->
+                <VisualState x:Name="Portrait">
+                    <VisualState.StateTriggers>
+                        <OrientationStateTrigger Orientation="Portrait" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter TargetName="ContentGrid" Property="Grid.ColumnDefinitions" Value="*" />
+                        <Setter TargetName="ContentGrid" Property="Grid.RowDefinitions" Value="*,*" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Row" Value="1" />
+                        <Setter TargetName="DetailsScrollView" Property="Padding" Value="5" />
+                        <Setter TargetName="DetailsScrollView" Property="Margin" Value="0,0,0,0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+            <VisualStateGroup x:Name="WidthStates">
+                <VisualState x:Name="WideScreen">
+                    <VisualState.StateTriggers>
+                        <OrientationStateTrigger Orientation="Landscape" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <!-- Горизонтальный layout для широких экранов -->
+                        <Setter TargetName="ContentGrid" Property="Grid.ColumnDefinitions" Value="*,*" />
+                        <Setter TargetName="ContentGrid" Property="Grid.RowDefinitions" Value="*" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Column" Value="1" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Row" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="NarrowScreen">
+                    <VisualState.StateTriggers>
+                        <OrientationStateTrigger Orientation="Portrait" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <!-- Вертикальный layout для узких экранов -->
+                        <Setter TargetName="ContentGrid" Property="Grid.ColumnDefinitions" Value="*" />
+                        <Setter TargetName="ContentGrid" Property="Grid.RowDefinitions" Value="*,*" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="BooksScrollView" Property="Grid.Row" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Column" Value="0" />
+                        <Setter TargetName="DetailsScrollView" Property="Grid.Row" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </ContentPage>
 
